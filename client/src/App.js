@@ -1,11 +1,17 @@
 import React, { Component } from 'react';
+import './components/layout/Navbar';
 import './App.css';
+import Navbar from './components/layout/Navbar';
+import Footer from './components/layout/Footer';
+import Landing from './components/layout/Landing';
 
 class App extends Component {
   render() {
     return (
       <div className="App">
-        <h1>Cookery</h1>
+        <Navbar />
+        <Landing />
+        <Footer />
       </div>
     );
   }
