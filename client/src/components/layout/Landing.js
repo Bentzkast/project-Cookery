@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 
 export default class componentName extends Component {
   render() {
@@ -9,17 +10,24 @@ export default class componentName extends Component {
           <div className="col s12">
             <div className="row">
               <div className="col s6 ">
-                <a
-                  href="register.html"
-                  className="btn waves-effect waves light"
-                >
-                  Register
-                </a>
+                <div>
+                  <Link
+                    to="/register"
+                    className="btn btn-wide waves-effect waves light"
+                  >
+                    Sign&nbsp;Up
+                  </Link>
+                </div>
               </div>
               <div className="col s6 ">
-                <a href="login.html" className="btn waves-effect waves light">
-                  Login
-                </a>
+                <div>
+                  <Link
+                    to="/login"
+                    className="btn btn-wide waves-effect waves light"
+                  >
+                    Log&nbsp;in
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
