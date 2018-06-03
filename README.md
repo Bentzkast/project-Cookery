@@ -15,8 +15,12 @@ Homemade recipe sharing web application.
 
 ## Client Dependencies
 
-* React
-* Redux
+* create-react-app
+* redux
+* react-redux
+* redux-thunk
+* axios
+* jwt-decode
 
 ## API Dependencies
 

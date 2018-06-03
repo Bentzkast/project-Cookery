@@ -5,6 +5,7 @@ import rootReducer from './reducers';
 const initialState = {};
 const middleware = [thunk];
 
+// redux main storage
 const store = createStore(
   rootReducer,
   initialState,

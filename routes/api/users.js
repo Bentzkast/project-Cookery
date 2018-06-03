@@ -1,20 +1,20 @@
-const express = require("express");
-const gravatar = require("gravatar");
-const bycrypt = require("bcryptjs");
+const express = require('express');
+const gravatar = require('gravatar');
+const bycrypt = require('bcryptjs');
 const router = express.Router();
-const User = require("../../models/User");
-const jwt = require("jsonwebtoken");
-const keys = require("../../config/keys");
-const passport = require("passport");
-const validateRegistrationInput = require("../../validation/registration");
-const validateLoginInput = require("../../validation/login");
+const User = require('../../models/User');
+const jwt = require('jsonwebtoken');
+const keys = require('../../config/keys');
+const passport = require('passport');
+const validateRegistrationInput = require('../../validation/registration');
+const validateLoginInput = require('../../validation/login');
 
 // @route   GET api/users/
-// @desc    Test users route
+// @desc    Get my users info
 // @access  Private
 router.get(
-  "/",
-  passport.authenticate("jwt", { session: false }),
+  '/',
+  passport.authenticate('jwt', { session: false }),
   (req, res) => {
     // console.log(req);
     return res.json({
@@ -26,9 +26,9 @@ router.get(
 );
 
 // @route   POST api/users/register
-// @desc    Test users route
+// @desc    register for a new user
 // @access  Public
-router.post("/register", (req, res) => {
+router.post('/register', (req, res) => {
   // check for illegal input
   const { errors, isValid } = validateRegistrationInput(req.body);
   if (!isValid) {
@@ -39,14 +39,14 @@ router.post("/register", (req, res) => {
   User.findOne({ email: req.body.email }).then(user => {
     if (user) {
       // error response
-      errors.email = "Email already exist";
+      errors.email = 'Email already exist';
       res.status(400).json(errors);
     } else {
       // create model
       const picture = gravatar.url(req.body.email, {
         s: 200, // size
-        r: "pg",
-        d: "mm"
+        r: 'pg',
+        d: 'mm'
       });
 
       const newUser = new User({
@@ -66,7 +66,7 @@ router.post("/register", (req, res) => {
           // add to database
           newUser
             .save()
-            .then(user => res.json(user))
+            .then(user => res.location('/login').end())
             .catch(err => {
               console.log(err);
               return res.status(500).end();
@@ -78,32 +78,38 @@ router.post("/register", (req, res) => {
 });
 
 // @route   POST api/users/login
-// @desc    Test users route
+// @desc    obtain jwt token auth for a user
 // @access  Public
 
-router.post("/login", (req, res) => {
-  const username = req.body.username;
-  const password = req.body.password;
+router.post('/login', (req, res) => {
   const { errors, isValid } = validateLoginInput(req.body);
   if (!isValid) {
-    res.status(400).json(errors);
+    return res.status(400).json(errors);
   }
+  const username = req.body.username;
+  const email = req.body.email;
+  const password = req.body.password;
+
   // find user by email
-  User.findOne({ username }).then(user => {
+  User.findOne({ $or: [{ email }, { username }] }).then(user => {
     if (!user) {
-      errors.username = "Username not found";
+      errors.user = 'User not found';
       return res.status(400).json(errors);
     }
     // check password
     bycrypt.compare(password, user.password).then(isMatch => {
       if (!isMatch) {
-        errors.password = "Password is incorrect";
+        errors.password = 'Password is incorrect';
         return res.status(400).json(errors);
       }
 
       //success
       // create a payload
-      const payload = { id: user.id, username: user.username };
+      const payload = {
+        id: user.id,
+        username: user.username,
+        picture: user.picture
+      };
       // sign token
       jwt.sign(payload, keys.secretOrKey, { expiresIn: 3600 }, (err, token) => {
         if (err) {
@@ -112,7 +118,7 @@ router.post("/login", (req, res) => {
         }
         return res
           .status(200)
-          .json({ success: true, token: "Bearer " + token });
+          .json({ success: true, token: 'Bearer ' + token });
       });
     });
   });
